@@ -1,0 +1,59 @@
+version: "3"
+
+networks:
+  backend:
+
+volumes:
+  db_app:
+
+services:
+  php:
+    build:
+        context: .
+        dockerfile: docker/php/Dockerfile
+        args:
+            TIMEZONE: ${TIMEZONE}
+    volumes:
+        - ./symfony/:/var/www/symfony/
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    networks:
+        - backend
+        
+  nginx:
+    build:
+        context: .
+        dockerfile: docker/nginx/Dockerfile
+    volumes:
+        - ./symfony/:/var/www/symfony/
+    ports:
+        - 80:80
+    networks:
+        - backend
+
+  db:
+    image: mysql:8.0.20
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+        - "db_app:/var/lib/mysql"
+    environment:
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+        - 3306:3306
+    networks:
+        - backend
+        
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8181:80
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+    networks:
+      - backend

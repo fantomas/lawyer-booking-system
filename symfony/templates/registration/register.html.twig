@@ -1,0 +1,77 @@
+{# extends 'base.html.twig' #}
+{% extends ea is defined ? ea.templatePath('layout') : '@EasyAdmin/page/login_minimal.html.twig' %}
+
+
+{% block page_title %}Register{% endblock %}
+{% block body_class 'page-login' %}
+
+{% block wrapper_wrapper %}
+    {% set page_title = block('page_title') %}
+    {% set _username_label = username_label is defined ? username_label|trans : 'login_page.username'|trans({}, 'EasyAdminBundle') %}
+    {% set _password_label = password_label is defined ? password_label|trans : 'login_page.password'|trans({}, 'EasyAdminBundle') %}
+    {% block body %}
+<div class="login-wrapper">
+    <header class="main-header mb-4">
+        <div id="header-logo">
+            {% block header_logo %}
+                {% if page_title %}
+                    {% if ea is defined %}
+                        <a class="logo {{ page_title|length > 14 ? 'logo-long' }}" title="{{ page_title|striptags }}" href="{{ path(ea.dashboardRouteName) }}">
+                            {{ page_title|raw }}
+                        </a>
+                    {% else %}
+                        <div class="logo {{ page_title|length > 14 ? 'logo-long' }}">
+                            {{ page_title|raw }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endblock header_logo %}
+        </div>
+    </header>
+        {% for flashError in app.flashes('verify_email_error') %}
+            <div class="alert alert-danger" role="alert">{{ flashError }}</div>
+        {% endfor %}
+
+    {% if error|default(false) %}
+        <div class="w-100 alert alert-danger">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <section class="content">
+        {{ form_start(registrationForm) }}
+        <div class="form-group field-text">
+            <div class="form-widget">
+                {{ form_widget(registrationForm.email, { 'attr': {'placeholder': 'Email',
+                    'class': 'form-control', 'required': true}
+                }) }}
+            </div>
+        </div>
+        <div class="form-group field-text">
+            <div class="form-widget">
+                {{ form_widget(registrationForm.plainPassword, { 'attr': {'placeholder': 'Password',
+                    'class': 'form-control', 'required': true}
+                }) }}
+            </div>
+        </div>
+        <div class="form-group field-choice">
+            <div class="form-widget">
+                {{ form_label(registrationForm.roles, 'Register as:') }}
+                {{ form_widget(registrationForm.roles, { 'attr': {
+                    'style': 'vertical-align: top;', 'required': true}
+                }) }}
+            </div>
+        </div>
+            {# form_row(registrationForm.email) #}
+            {# form_row(registrationForm.plainPassword, {
+                label: 'Password'
+            }) #}
+            {# form_row(registrationForm.roles) #}
+            {# form_row(registrationForm.agreeTerms) #}
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+        {{ form_end(registrationForm) }}
+    </section>
+</div>
+    {% endblock %}
+{% endblock %}

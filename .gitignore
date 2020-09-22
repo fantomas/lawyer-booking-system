@@ -1,0 +1,5 @@
+.idea
+/storage/*.key
+/vendor
+.env.backup
+.phpunit.result.cache
